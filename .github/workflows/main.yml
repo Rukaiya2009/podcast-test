@@ -1,25 +1,39 @@
 name: Generate Podcast Feeds
 on: [push]
-jobs: 
+
+jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install Depencies
+
+      - name: Verify Python Installation
+        run: python --version  # Check if Python is available
+
+      - name: List Repository Files
+        run: ls -R  # Check if feed.py exists in the right location
+
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyyaml
+
       - name: Run Feed Generator
-        run: python feed.py
+        run: python feed.py  # Ensure correct script execution
+
       - name: Push Repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Required for pushing
         run: |
-            git config user.name github-actions
-            git config user.email github-actions@github.com
-            git add .
-            git commit -m "Modified Feed"
-            git push
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add .
+          git commit -m "Modified Feed"
+          git push
